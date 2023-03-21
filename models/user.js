@@ -33,11 +33,11 @@ if(cartProductIndex >= 0){
   })
 }
 // 
-let db = getDb();
+
 let updatedCart = {
   items:updatedCartItems ,
 }
-
+let db = getDb();
 return db
 .collection('users')
 .updateOne({_id: new ObjectId(this._id)},
@@ -45,6 +45,43 @@ return db
 );
 
 }
+
+getCart(){
+  //return this.cart;
+  const db = getDb();
+  const productIds = this.cart.items.map(i =>{
+    return i.productId;
+  })
+  return db.collection('products')
+  .find({_id:{$in:productIds}})// `in` operator takes array of  id and therefore every id will be accepted and return back cursor which holds refrences of the all products which one of the id is menthoned in the array
+   .toArray()
+   .then(products =>{
+ return products.map( p=>{
+  return {
+    ...p , 
+    quantity:this.cart.items.find(i =>{
+    return i.productId.toString() === p._id.toString()
+  }).quantity
+};
+ })
+   })
+  //  .catch(err =>{
+  //   console.log(err)
+  //  })
+}
+
+deleteItemFromCart(productId){
+  let updatedCartItems  = this.cart.items.filter(item =>{
+    return item.productId.toString() !== productId.toString()
+  });
+  let db = getDb();
+return db
+.collection('users')
+.updateOne({_id: new ObjectId(this._id)},
+{$set:{cart:{items:updatedCartItems}}}
+);
+}
+
 
   static findByPk(userId) {
     const db = getDb();
