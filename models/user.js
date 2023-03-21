@@ -82,7 +82,34 @@ return db
 );
 }
 
-
+addOrder() {// this does not take any argument because cart which will be passed as an order or as data for an order will already register in this user 
+const db = getDb();
+return this.getCart().then(products =>{
+  const order = {
+    items:products,
+    user:{
+      _id:new ObjectId(this._id),
+      name:this.name, 
+    }
+  }
+return db.collection('order')
+.insertOne(order)
+})
+.then(result =>{
+  this.cart = {items:[]}
+ return  db
+  .collection('users')
+  .updateOne({_id: new ObjectId(this._id)},
+  {$set:{cart:{items:[]}}}
+  );
+})  
+}
+getOrder(){
+  const db = getDb();
+   return db.collection('order')
+   .find({'user._id':new ObjectId(this._id)})
+   .toArray()
+}
   static findByPk(userId) {
     const db = getDb();
     return db
