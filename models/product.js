@@ -72,6 +72,8 @@ class Product{
       throw new Error(err)
     })
   }
+  
+  
 }
 
 module.exports = Product ;
