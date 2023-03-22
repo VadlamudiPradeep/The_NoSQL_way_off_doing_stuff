@@ -20,7 +20,8 @@ exports.postAddProduct = (req, res, next) => {
     title:title, 
     price:price, 
     description: description, 
-    imageUrl:imageUrl
+    imageUrl:imageUrl,
+    userId:req.user // || req.user_id 
   });
     product
     .save()// This `save` method comes from the mongoose
@@ -81,7 +82,12 @@ Product.findById(prodId).then(product =>{
 exports.getProducts = (req, res, next) => {
 
  Product.find()
+//  .select('title price -_id') /* this allows to define which fields do we want select or unselect   */
+//  .populate('userId','name') /* populate tells mongoose to populate the certain field with all details
+//    information not just id
+//  */
     .then(products => {
+      console.log(products)
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',
