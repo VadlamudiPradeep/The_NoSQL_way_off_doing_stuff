@@ -3,7 +3,7 @@ const Schema = mongoose.Schema ; /* to construct the schema
 it allows to create new schemas .
 */
 
-const productSchema = new Schema({
+const userSchema = new Schema({
 name:{
   type:String,
   required:true,
@@ -23,12 +23,49 @@ cart:{
       type:Number ,
       required:true,
     },
-
-    }]
+    }
+  ]
 }
 });
+userSchema.methods.addToCart = function(product){
+  let cartProductIndex = this.cart.items.findIndex(cp =>{
+  return cp.productId.toString() === product._id.toString();
+ })
+let newQuantity = 1 ;
+let updatedCartItems = [...this.cart.items];
 
-module.exports = mongoose.model('User', productSchema);
+if(cartProductIndex >= 0){
+  newQuantity = this.cart.items[cartProductIndex].quantity + 1 ;
+  updatedCartItems[cartProductIndex].quantity = newQuantity;
+}else{
+  updatedCartItems.push({
+    productId:product._id ,
+     quantity:newQuantity
+  })
+}
+
+let updatedCart = {
+  items:updatedCartItems ,
+}
+this.cart = updatedCart;
+return this.save();
+
+// mongodb code
+//let db = getDb()
+// return db
+// .collection('users')
+// .updateOne({_id: new ObjectId(this._id)},
+// {$set:{cart:updatedCart}}
+// )
+}
+
+// userSchema.models.getCart = function(){
+  
+
+// }
+
+
+module.exports = mongoose.model('User', userSchema);
 
 
 
@@ -126,7 +163,8 @@ module.exports = mongoose.model('User', productSchema);
 // return db
 // .collection('users')
 // .updateOne({_id: new ObjectId(this._id)},
-// {$set:{cart:{items:updatedCartItems}}}
+// {$set:{cart:{items:updatedCartItems}}
+//}
 // );
 // }
 
